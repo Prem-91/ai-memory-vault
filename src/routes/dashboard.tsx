@@ -152,6 +152,7 @@ function DashboardLayout() {
         <main className="min-h-screen p-4 md:p-8 pb-24 md:pb-8">
           <Outlet />
         </main>
+      </div>
       <QuickCaptureFab />
     </div>
   );
