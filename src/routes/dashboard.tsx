@@ -20,14 +20,20 @@ export const Route = createFileRoute("/dashboard")({
   component: DashboardLayout,
 });
 
-const navItems = [
+const navItems: Array<{
+  to: "/dashboard" | "/dashboard/memories" | "/dashboard/projects" | "/dashboard/capture" | "/dashboard/export" | "/dashboard/settings";
+  label: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  icon: any;
+  exact?: boolean;
+}> = [
   { to: "/dashboard", label: "Overview", icon: LayoutDashboard, exact: true },
   { to: "/dashboard/memories", label: "Memories", icon: Brain },
   { to: "/dashboard/projects", label: "Projects", icon: FolderKanban },
   { to: "/dashboard/capture", label: "Capture", icon: Plus },
   { to: "/dashboard/export", label: "Export", icon: Download },
   { to: "/dashboard/settings", label: "Settings", icon: Settings },
-] as const;
+];
 
 function DashboardLayout() {
   const { user, signOut } = useAuth();
