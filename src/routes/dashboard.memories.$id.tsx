@@ -117,7 +117,7 @@ function MemoryDetailPage() {
               <p className="text-sm">{m.summary}</p>
             </div>
           )}
-          {m.key_points?.length > 0 && (
+          {m.key_points && m.key_points.length > 0 && (
             <div className="rounded-xl glass p-5">
               <h3 className="text-xs uppercase text-muted-foreground mb-2">Key Points</h3>
               <ul className="space-y-1.5 text-sm">
@@ -134,9 +134,9 @@ function MemoryDetailPage() {
         </TabsContent>
 
         <TabsContent value="insights" className="space-y-4 mt-4">
-          <InsightSection title="Decisions Made" items={m.decisions} accent="text-primary" />
-          <InsightSection title="Open Questions" items={m.open_questions} accent="text-amber-300" />
-          <InsightSection title="Action Items" items={m.action_items} accent="text-cyan-300" checkable />
+          <InsightSection title="Decisions Made" items={m.decisions ?? []} accent="text-primary" />
+          <InsightSection title="Open Questions" items={m.open_questions ?? []} accent="text-amber-300" />
+          <InsightSection title="Action Items" items={m.action_items ?? []} accent="text-cyan-300" checkable />
           <div className="rounded-xl glass p-5">
             <h3 className="text-xs uppercase text-muted-foreground mb-2">Relevance Score</h3>
             <div className="h-2 rounded-full bg-white/5 overflow-hidden">
