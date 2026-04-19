@@ -9,6 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { QuickCaptureFab } from "@/components/quick-capture-fab";
 
 export const Route = createFileRoute("/dashboard")({
   beforeLoad: async () => {
