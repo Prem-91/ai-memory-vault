@@ -141,10 +141,14 @@ function DashboardHome() {
             <span className="text-xs font-semibold uppercase tracking-wider text-primary">Getting Started</span>
           </div>
           <h2 className="text-xl md:text-2xl font-bold mb-2">Bridge context across every AI you use</h2>
-          <p className="text-sm text-muted-foreground mb-5 max-w-2xl">
-            AI Context Bridge captures your conversations from ChatGPT, Claude, and Gemini, then lets you inject that
-            context back into any chat — so you never re-explain yourself again. Free, unlimited, forever.
+          <p className="text-sm text-muted-foreground mb-3 max-w-2xl">
+            AI Context Bridge captures your conversations from <strong className="text-foreground">ChatGPT, Claude, Gemini, Perplexity, Copilot, Mistral, DeepSeek, Grok, Poe</strong> and more — then lets you inject that context back into any chat. <strong className="text-emerald-300">100% free, unlimited, forever.</strong>
           </p>
+          <div className="flex flex-wrap gap-1.5 mb-5">
+            {["ChatGPT", "Claude", "Gemini", "Perplexity", "Copilot", "Mistral", "DeepSeek", "Grok", "Poe", "you.com", "Phind", "HuggingChat"].map((p) => (
+              <span key={p} className="text-[10px] uppercase font-semibold rounded-full bg-white/5 border border-white/10 px-2 py-0.5 text-muted-foreground">{p}</span>
+            ))}
+          </div>
 
           <div className="grid md:grid-cols-3 gap-3 mb-5">
             <FeatureTile icon={Layers} title="Capture anywhere" desc="Manually paste, use the Chrome extension, or right-click selections on any AI chat." />
