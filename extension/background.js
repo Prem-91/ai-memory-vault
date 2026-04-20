@@ -69,6 +69,15 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
     if (u.includes("chatgpt.com") || u.includes("openai.com")) return "chatgpt";
     if (u.includes("claude.ai")) return "claude";
     if (u.includes("gemini.google.com")) return "gemini";
+    if (u.includes("perplexity")) return "perplexity";
+    if (u.includes("copilot") || u.includes("bing.com")) return "copilot";
+    if (u.includes("mistral")) return "mistral";
+    if (u.includes("deepseek")) return "deepseek";
+    if (u.includes("grok") || u.includes("x.com/i/grok")) return "grok";
+    if (u.includes("poe.com")) return "poe";
+    if (u.includes("you.com")) return "you";
+    if (u.includes("phind")) return "phind";
+    if (u.includes("huggingface")) return "huggingface";
     return "selection";
   })();
   try {

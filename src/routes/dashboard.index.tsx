@@ -141,10 +141,14 @@ function DashboardHome() {
             <span className="text-xs font-semibold uppercase tracking-wider text-primary">Getting Started</span>
           </div>
           <h2 className="text-xl md:text-2xl font-bold mb-2">Bridge context across every AI you use</h2>
-          <p className="text-sm text-muted-foreground mb-5 max-w-2xl">
-            AI Context Bridge captures your conversations from ChatGPT, Claude, and Gemini, then lets you inject that
-            context back into any chat — so you never re-explain yourself again. Free, unlimited, forever.
+          <p className="text-sm text-muted-foreground mb-3 max-w-2xl">
+            AI Context Bridge captures your conversations from <strong className="text-foreground">ChatGPT, Claude, Gemini, Perplexity, Copilot, Mistral, DeepSeek, Grok, Poe</strong> and more — then lets you inject that context back into any chat. <strong className="text-emerald-300">100% free, unlimited, forever.</strong>
           </p>
+          <div className="flex flex-wrap gap-1.5 mb-5">
+            {["ChatGPT", "Claude", "Gemini", "Perplexity", "Copilot", "Mistral", "DeepSeek", "Grok", "Poe", "you.com", "Phind", "HuggingChat"].map((p) => (
+              <span key={p} className="text-[10px] uppercase font-semibold rounded-full bg-white/5 border border-white/10 px-2 py-0.5 text-muted-foreground">{p}</span>
+            ))}
+          </div>
 
           <div className="grid md:grid-cols-3 gap-3 mb-5">
             <FeatureTile icon={Layers} title="Capture anywhere" desc="Manually paste, use the Chrome extension, or right-click selections on any AI chat." />
@@ -153,22 +157,27 @@ function DashboardHome() {
           </div>
 
           <div className="rounded-xl bg-background/60 border border-border p-4 space-y-3">
-            <h3 className="text-sm font-semibold">How to use it — 3 steps</h3>
+            <h3 className="text-sm font-semibold">How to install the Chrome extension (1 minute)</h3>
             <ol className="space-y-2 text-sm">
-              <Step n={1} title="Create a project" desc="Group memories by topic, client, or codebase.">
-                <Link to="/dashboard/projects"><Button size="sm" variant="outline" className="h-7 text-xs">New project <ArrowRight className="size-3 ml-1" /></Button></Link>
+              <Step n={1} title="Download the extension" desc="Click below to download the .zip and unzip it anywhere on your computer.">
+                <Button size="sm" onClick={downloadExtension} className="h-7 text-xs gradient-bg border-0">
+                  <Chrome className="size-3 mr-1" /> Download extension (.zip)
+                </Button>
               </Step>
-              <Step n={2} title="Capture memories" desc="Paste a chat manually or install the extension to capture from ChatGPT, Claude, and Gemini.">
+              <Step n={2} title="Open chrome://extensions" desc="Paste chrome://extensions into your address bar (works in Chrome, Edge, Brave, Arc, Opera).">
+                <code className="text-[11px] bg-white/5 rounded px-2 py-1">chrome://extensions</code>
+              </Step>
+              <Step n={3} title="Enable Developer mode & Load unpacked" desc="Toggle Developer mode (top-right), then click 'Load unpacked' and pick the unzipped folder.">
+                {extDetected && <span className="text-xs text-emerald-400">✓ Extension detected on this site</span>}
+              </Step>
+              <Step n={4} title="Connect your account" desc="Open Settings → copy your access token, click the extension icon in your toolbar, paste the token, hit Connect.">
+                <Link to="/dashboard/settings"><Button size="sm" variant="outline" className="h-7 text-xs">Open settings <ArrowRight className="size-3 ml-1" /></Button></Link>
+              </Step>
+              <Step n={5} title="Capture from any AI chat" desc="Visit ChatGPT, Claude, Gemini, Perplexity, Copilot, Mistral, DeepSeek, Grok, Poe — click the floating 'Capture to Vault' button, or right-click selected text → Capture selection.">
                 <div className="flex flex-wrap gap-2">
-                  <Link to="/dashboard/capture"><Button size="sm" variant="outline" className="h-7 text-xs"><Brain className="size-3 mr-1" /> Quick capture</Button></Link>
-                  <Button size="sm" onClick={downloadExtension} className="h-7 text-xs gradient-bg border-0">
-                    <Chrome className="size-3 mr-1" /> Get extension
-                  </Button>
-                  {extDetected && <span className="text-xs text-emerald-400 self-center">✓ Installed</span>}
+                  <Link to="/dashboard/capture"><Button size="sm" variant="outline" className="h-7 text-xs"><Brain className="size-3 mr-1" /> Or paste manually</Button></Link>
+                  <Link to="/dashboard/memories"><Button size="sm" variant="outline" className="h-7 text-xs"><Copy className="size-3 mr-1" /> Browse memories</Button></Link>
                 </div>
-              </Step>
-              <Step n={3} title="Inject context anywhere" desc="Open any memory, click 'Copy context pack', and paste into your next AI chat.">
-                <Link to="/dashboard/memories"><Button size="sm" variant="outline" className="h-7 text-xs"><Copy className="size-3 mr-1" /> Browse memories</Button></Link>
               </Step>
             </ol>
           </div>
