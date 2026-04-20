@@ -234,3 +234,28 @@ function DashboardHome() {
     </div>
   );
 }
+
+function FeatureTile({ icon: Icon, title, desc }: { icon: typeof Brain; title: string; desc: string }) {
+  return (
+    <div className="rounded-xl bg-background/40 border border-border p-4">
+      <Icon className="size-5 text-primary mb-2" />
+      <h3 className="text-sm font-semibold mb-1">{title}</h3>
+      <p className="text-xs text-muted-foreground">{desc}</p>
+    </div>
+  );
+}
+
+function Step({ n, title, desc, children }: { n: number; title: string; desc: string; children: React.ReactNode }) {
+  return (
+    <li className="flex gap-3">
+      <span className="flex-none size-6 rounded-full bg-primary/15 text-primary text-xs font-semibold grid place-items-center mt-0.5">{n}</span>
+      <div className="flex-1 space-y-2">
+        <div>
+          <p className="font-medium">{title}</p>
+          <p className="text-xs text-muted-foreground">{desc}</p>
+        </div>
+        {children}
+      </div>
+    </li>
+  );
+}
