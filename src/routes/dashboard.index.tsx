@@ -237,7 +237,7 @@ function DashboardHome() {
   );
 }
 
-function FeatureTile({ icon: Icon, title, desc }: { icon: typeof Brain; title: string; desc: string }) {
+function FeatureTile({ icon: Icon, title, desc }: { icon: React.ComponentType<{ className?: string }>; title: string; desc: string }) {
   return (
     <div className="rounded-xl bg-background/40 border border-border p-4">
       <Icon className="size-5 text-primary mb-2" />
