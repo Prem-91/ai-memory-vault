@@ -1,14 +1,26 @@
 {
   "manifest_version": 3,
   "name": "AI Context Bridge",
-  "version": "1.0.0",
-  "description": "Capture context from ChatGPT, Claude, and Gemini. Inject memory packs back into any AI chat.",
+  "version": "1.1.0",
+  "description": "Capture context from any AI chat (ChatGPT, Claude, Gemini, Perplexity, Copilot, Mistral, DeepSeek, Grok, Poe & more) and inject memory packs back.",
   "permissions": ["activeTab", "storage", "scripting", "tabs", "contextMenus"],
   "host_permissions": [
     "https://chatgpt.com/*",
     "https://chat.openai.com/*",
     "https://claude.ai/*",
     "https://gemini.google.com/*",
+    "https://www.perplexity.ai/*",
+    "https://perplexity.ai/*",
+    "https://copilot.microsoft.com/*",
+    "https://www.bing.com/chat*",
+    "https://chat.mistral.ai/*",
+    "https://chat.deepseek.com/*",
+    "https://grok.com/*",
+    "https://x.com/i/grok*",
+    "https://poe.com/*",
+    "https://you.com/*",
+    "https://www.phind.com/*",
+    "https://huggingface.co/chat/*",
     "https://*.lovable.app/*",
     "http://localhost/*"
   ],
@@ -43,6 +55,25 @@
     {
       "matches": ["https://gemini.google.com/*"],
       "js": ["content/common.js", "content/gemini.js"],
+      "css": ["content/styles.css"],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": [
+        "https://www.perplexity.ai/*",
+        "https://perplexity.ai/*",
+        "https://copilot.microsoft.com/*",
+        "https://www.bing.com/chat*",
+        "https://chat.mistral.ai/*",
+        "https://chat.deepseek.com/*",
+        "https://grok.com/*",
+        "https://x.com/i/grok*",
+        "https://poe.com/*",
+        "https://you.com/*",
+        "https://www.phind.com/*",
+        "https://huggingface.co/chat/*"
+      ],
+      "js": ["content/common.js", "content/generic.js"],
       "css": ["content/styles.css"],
       "run_at": "document_idle"
     },

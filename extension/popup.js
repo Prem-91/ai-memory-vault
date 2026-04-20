@@ -53,10 +53,21 @@ $("capture-now").addEventListener("click", async () => {
       },
     });
     const url = tab.url || "";
-    const platform = url.includes("chatgpt.com") || url.includes("openai.com") ? "chatgpt"
-      : url.includes("claude.ai") ? "claude"
-      : url.includes("gemini.google.com") ? "gemini"
-      : "manual";
+    const h = (() => { try { return new URL(url).hostname; } catch { return ""; } })();
+    const platform =
+      h.includes("chatgpt.com") || h.includes("openai.com") ? "chatgpt" :
+      h.includes("claude.ai") ? "claude" :
+      h.includes("gemini.google.com") ? "gemini" :
+      h.includes("perplexity") ? "perplexity" :
+      h.includes("copilot") || h.includes("bing.com") ? "copilot" :
+      h.includes("mistral") ? "mistral" :
+      h.includes("deepseek") ? "deepseek" :
+      h.includes("grok") || h.includes("x.com") ? "grok" :
+      h.includes("poe.com") ? "poe" :
+      h.includes("you.com") ? "you" :
+      h.includes("phind") ? "phind" :
+      h.includes("huggingface") ? "huggingface" :
+      "manual";
     const r = await send({
       type: "ACB_SYNC",
       payload: {
