@@ -8,7 +8,6 @@ import {
   Globe,
   WifiOff,
   ArrowRight,
-  Check,
 } from "lucide-react";
 import { Logo } from "@/components/logo";
 import { Button } from "@/components/ui/button";
@@ -45,14 +44,14 @@ function Landing() {
         <nav className="hidden md:flex items-center gap-8 text-sm text-muted-foreground">
           <a href="#features" className="hover:text-foreground transition">Features</a>
           <a href="#how" className="hover:text-foreground transition">How it works</a>
-          <a href="#pricing" className="hover:text-foreground transition">Pricing</a>
+          <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/15 text-emerald-300 px-2 py-0.5 text-[11px] font-semibold uppercase">100% Free</span>
         </nav>
         <div className="flex items-center gap-2">
           <Button asChild variant="ghost" size="sm">
             <Link to="/login">Sign in</Link>
           </Button>
           <Button asChild size="sm" className="gradient-bg glow-violet-sm border-0">
-            <Link to="/signup">Start Free</Link>
+            <Link to="/signup">Get started — Free</Link>
           </Button>
         </div>
       </header>
@@ -195,45 +194,18 @@ function Landing() {
         </div>
       </section>
 
-      {/* Pricing */}
-      <section id="pricing" className="relative z-10 px-6 md:px-10 py-20 max-w-4xl mx-auto">
-        <h2 className="text-center text-3xl md:text-4xl font-bold">Simple pricing</h2>
-        <div className="mt-12 grid md:grid-cols-2 gap-4">
-          <div className="rounded-2xl glass p-8">
-            <h3 className="font-semibold text-lg">Free</h3>
-            <div className="mt-2 text-4xl font-bold">$0<span className="text-sm font-normal text-muted-foreground">/mo</span></div>
-            <ul className="mt-6 space-y-2 text-sm text-muted-foreground">
-              {["50 memories", "3 projects", "Basic export", "Chrome extension"].map((f) => (
-                <li key={f} className="flex items-center gap-2">
-                  <Check className="size-4 text-primary" /> {f}
-                </li>
-              ))}
-            </ul>
-            <Button asChild className="mt-6 w-full" variant="outline">
-              <Link to="/signup">Start Free</Link>
-            </Button>
-          </div>
-          <div className="rounded-2xl glass-strong p-8 border border-primary/30 glow-violet relative">
-            <span className="absolute -top-3 right-6 rounded-full gradient-bg px-3 py-1 text-[10px] font-bold uppercase text-white">Popular</span>
-            <h3 className="font-semibold text-lg">Pro</h3>
-            <div className="mt-2 text-4xl font-bold">$9<span className="text-sm font-normal text-muted-foreground">/mo</span></div>
-            <ul className="mt-6 space-y-2 text-sm text-muted-foreground">
-              {[
-                "Unlimited memories",
-                "Unlimited projects",
-                "AI analysis with Gemini",
-                "Team features",
-                "Priority support",
-              ].map((f) => (
-                <li key={f} className="flex items-center gap-2">
-                  <Check className="size-4 text-primary" /> {f}
-                </li>
-              ))}
-            </ul>
-            <Button asChild className="mt-6 w-full gradient-bg border-0">
-              <Link to="/signup">Upgrade to Pro</Link>
-            </Button>
-          </div>
+      {/* Free forever */}
+      <section className="relative z-10 px-6 md:px-10 py-20 max-w-4xl mx-auto">
+        <div className="rounded-2xl glass-strong p-10 border border-primary/30 glow-violet text-center">
+          <span className="inline-flex rounded-full bg-emerald-500/15 text-emerald-300 px-3 py-1 text-xs font-bold uppercase">100% Free • Forever</span>
+          <h2 className="mt-4 text-3xl md:text-4xl font-bold">No paywalls. No limits.</h2>
+          <p className="mt-3 text-muted-foreground max-w-xl mx-auto">
+            Unlimited memories, projects, exports, and Chrome extension access. Bring your own free
+            Gemini API key for AI analysis — your data stays yours.
+          </p>
+          <Button asChild size="lg" className="mt-8 gradient-bg border-0 h-12 px-6">
+            <Link to="/signup">Create your vault — Free <ArrowRight className="ml-1 size-4" /></Link>
+          </Button>
         </div>
       </section>
 
