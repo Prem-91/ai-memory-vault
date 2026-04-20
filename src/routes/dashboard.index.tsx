@@ -175,7 +175,9 @@ function DashboardHome() {
         </section>
       )}
 
-
+      <section>
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="text-lg font-semibold">Recent memories</h2>
           <Link to="/dashboard/memories" className="text-xs text-primary hover:underline">View all</Link>
         </div>
         {recent.isLoading ? (
