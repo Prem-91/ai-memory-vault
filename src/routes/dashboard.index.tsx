@@ -16,6 +16,31 @@ export const Route = createFileRoute("/dashboard/")({
 
 function DashboardHome() {
   const { user } = useAuth();
+  const [extDetected, setExtDetected] = useState(false);
+  const [guideDismissed, setGuideDismissed] = useState(false);
+
+  useEffect(() => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    if (typeof window !== "undefined" && (window as any).__AI_MEMORY_VAULT_EXTENSION) setExtDetected(true);
+    if (typeof window !== "undefined" && localStorage.getItem("acb-guide-dismissed") === "1") setGuideDismissed(true);
+  }, []);
+
+  const dismissGuide = () => {
+    localStorage.setItem("acb-guide-dismissed", "1");
+    setGuideDismissed(true);
+  };
+
+  const downloadExtension = () => {
+    fetch("/ai-context-bridge-extension.zip")
+      .then((r) => r.blob())
+      .then((blob) => {
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = "ai-context-bridge-extension.zip";
+        a.click();
+        URL.revokeObjectURL(a.href);
+      });
+  };
 
   const stats = useQuery({
     queryKey: ["dashboard-stats", user?.id],
