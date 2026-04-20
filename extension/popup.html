@@ -1,0 +1,88 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>AI Context Bridge</title>
+<style>
+  :root { color-scheme: dark; }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; width: 340px; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, sans-serif;
+    background: #0a0a0f; color: #e5e7eb;
+  }
+  header { padding: 14px 16px; border-bottom: 1px solid #1e1e2e; display: flex; align-items: center; gap: 10px; }
+  .logo {
+    width: 28px; height: 28px; border-radius: 8px;
+    background: linear-gradient(135deg, #7c3aed, #06b6d4);
+    display: grid; place-items: center; font-weight: 700; color: white;
+  }
+  h1 { font-size: 14px; margin: 0; font-weight: 600; }
+  .sub { font-size: 11px; color: #94a3b8; margin: 0; }
+  main { padding: 14px 16px; }
+  .row { display: flex; align-items: center; gap: 8px; font-size: 12px; margin-bottom: 12px; }
+  .dot { width: 8px; height: 8px; border-radius: 999px; background: #475569; }
+  .dot.on { background: #34d399; box-shadow: 0 0 8px #34d399; }
+  label { display: block; font-size: 11px; color: #94a3b8; margin-bottom: 4px; text-transform: uppercase; letter-spacing: .04em; }
+  input, textarea {
+    width: 100%; background: #11111a; border: 1px solid #1e1e2e; border-radius: 8px;
+    padding: 8px 10px; font-size: 12px; color: #e5e7eb; font-family: ui-monospace, monospace;
+  }
+  textarea { min-height: 70px; resize: vertical; }
+  button {
+    width: 100%; padding: 9px 12px; border: 0; border-radius: 8px;
+    background: linear-gradient(135deg, #7c3aed, #06b6d4); color: white;
+    font-weight: 600; cursor: pointer; font-size: 12px;
+  }
+  button.secondary { background: #1a1a24; border: 1px solid #1e1e2e; color: #e5e7eb; }
+  button:disabled { opacity: .5; cursor: not-allowed; }
+  .stack > * + * { margin-top: 10px; }
+  .muted { color: #94a3b8; font-size: 11px; line-height: 1.4; }
+  .hr { height: 1px; background: #1e1e2e; margin: 14px 0; }
+  .pill { display: inline-block; padding: 2px 8px; border-radius: 999px; background: #1a1a24; border: 1px solid #1e1e2e; font-size: 10px; }
+  .ok { color: #34d399; }
+  .err { color: #f87171; }
+  a { color: #a78bfa; text-decoration: none; }
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">A</div>
+  <div>
+    <h1>AI Context Bridge</h1>
+    <p class="sub">Memory across ChatGPT • Claude • Gemini</p>
+  </div>
+</header>
+<main class="stack">
+  <div class="row">
+    <span id="status-dot" class="dot"></span>
+    <span id="status-text">Checking…</span>
+  </div>
+
+  <div id="signed-out">
+    <label>Dashboard URL</label>
+    <input id="dashboard-url" placeholder="https://your-app.lovable.app" />
+    <div style="height: 8px"></div>
+    <label>Access Token (Supabase JWT)</label>
+    <textarea id="token" placeholder="eyJhbGciOi..."></textarea>
+    <p class="muted">Open the dashboard → Settings → Extension → "Copy access token", then paste it here.</p>
+    <div style="height: 8px"></div>
+    <button id="save-token">Connect</button>
+    <div style="height: 6px"></div>
+    <button class="secondary" id="open-dashboard">Open dashboard</button>
+  </div>
+
+  <div id="signed-in" style="display:none">
+    <button id="capture-now">Capture this page</button>
+    <div style="height: 6px"></div>
+    <button class="secondary" id="open-dashboard-2">Open dashboard</button>
+    <div class="hr"></div>
+    <p class="muted">Tip: select any text on a chat page and right-click → "Capture selection to AI Context Bridge".</p>
+    <div style="height: 8px"></div>
+    <button class="secondary" id="signout">Disconnect</button>
+  </div>
+
+  <div id="msg" class="muted"></div>
+</main>
+<script src="popup.js"></script>
+</body>
+</html>
