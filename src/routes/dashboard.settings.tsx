@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Download, AlertTriangle } from "lucide-react";
+import { Download, AlertTriangle, Copy, Check, ExternalLink, Chrome } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
@@ -20,10 +20,15 @@ function SettingsPage() {
   const qc = useQueryClient();
   const [displayName, setDisplayName] = useState("");
   const [extDetected, setExtDetected] = useState(false);
+  const [token, setToken] = useState<string>("");
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     if (typeof window !== "undefined" && (window as any).__AI_MEMORY_VAULT_EXTENSION) setExtDetected(true);
+    supabase.auth.getSession().then(({ data }) => {
+      if (data.session?.access_token) setToken(data.session.access_token);
+    });
   }, []);
 
   const profile = useQuery({
@@ -83,8 +88,17 @@ function SettingsPage() {
         a.download = "ai-context-bridge-extension.zip";
         a.click();
         URL.revokeObjectURL(a.href);
+        toast.success("Extension downloaded", { description: "Unzip and load it in chrome://extensions" });
       })
       .catch(() => toast.error("Extension not available yet"));
+  };
+
+  const copyToken = async () => {
+    if (!token) { toast.error("No active session"); return; }
+    await navigator.clipboard.writeText(token);
+    setCopied(true);
+    toast.success("Token copied");
+    setTimeout(() => setCopied(false), 2000);
   };
 
   const deleteAll = useMutation({
@@ -100,7 +114,10 @@ function SettingsPage() {
 
   return (
     <div className="space-y-6 max-w-3xl">
-      <h1 className="text-2xl md:text-3xl font-bold">Settings</h1>
+      <div>
+        <h1 className="text-2xl md:text-3xl font-bold">Settings</h1>
+        <p className="text-sm text-muted-foreground mt-1">Manage your profile, extension, and data.</p>
+      </div>
 
       <Section title="Profile">
         <div className="flex items-center gap-4">
@@ -123,40 +140,80 @@ function SettingsPage() {
       </Section>
 
       <Section title="Chrome Extension">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between flex-wrap gap-3">
           <div className="flex items-center gap-2 text-sm">
-            <span className={`size-2 rounded-full ${extDetected ? "bg-emerald-400" : "bg-muted-foreground"}`} />
-            {extDetected ? "Extension connected" : "Extension not detected"}
+            <span className={`size-2 rounded-full ${extDetected ? "bg-emerald-400 shadow-[0_0_8px] shadow-emerald-400/60" : "bg-muted-foreground"}`} />
+            {extDetected ? "Extension installed & detected" : "Extension not detected"}
           </div>
-          <Button size="sm" variant="outline" onClick={downloadExtension}><Download className="size-3.5 mr-1.5" /> Download .zip</Button>
+          <Button size="sm" onClick={downloadExtension} className="gradient-bg border-0">
+            <Download className="size-3.5 mr-1.5" /> Download extension (.zip)
+          </Button>
         </div>
-        <p className="text-xs text-muted-foreground">
-          Unzip → open chrome://extensions → enable Developer mode → Load unpacked → select the folder.
-        </p>
+
+        <div className="rounded-lg border border-border bg-background/40 p-4 space-y-3">
+          <h3 className="text-sm font-semibold flex items-center gap-2"><Chrome className="size-4 text-primary" /> Install in 4 steps</h3>
+          <ol className="text-sm space-y-2 text-muted-foreground list-decimal list-inside">
+            <li>Click <strong className="text-foreground">Download extension</strong> above and unzip the file.</li>
+            <li>Open <code className="px-1.5 py-0.5 rounded bg-white/5 text-xs">chrome://extensions</code> in Chrome (or any Chromium browser: Edge, Brave, Arc).</li>
+            <li>Enable <strong className="text-foreground">Developer mode</strong> (top-right toggle).</li>
+            <li>Click <strong className="text-foreground">Load unpacked</strong> and select the unzipped folder.</li>
+          </ol>
+        </div>
+
+        <div className="rounded-lg border border-border bg-background/40 p-4 space-y-3">
+          <h3 className="text-sm font-semibold">Connect the extension to your account</h3>
+          <p className="text-xs text-muted-foreground">
+            After installing, click the extension icon in your toolbar and paste the access token below.
+          </p>
+          <div className="flex gap-2">
+            <Input value={token ? `${token.slice(0, 24)}…${token.slice(-12)}` : "No active session"} disabled className="font-mono text-xs" />
+            <Button size="sm" variant="outline" onClick={copyToken} disabled={!token}>
+              {copied ? <Check className="size-3.5 mr-1.5" /> : <Copy className="size-3.5 mr-1.5" />}
+              {copied ? "Copied" : "Copy token"}
+            </Button>
+          </div>
+          <p className="text-[11px] text-muted-foreground">
+            Token expires every hour and refreshes automatically while you're logged in. Copy a fresh one if the extension stops syncing.
+          </p>
+        </div>
+
+        <div className="rounded-lg border border-border bg-background/40 p-4 space-y-2">
+          <h3 className="text-sm font-semibold">What it does</h3>
+          <ul className="text-xs text-muted-foreground space-y-1.5">
+            <li>• Adds a <strong className="text-foreground">"Capture to Vault"</strong> button on ChatGPT, Claude, and Gemini.</li>
+            <li>• Right-click any selected text → <strong className="text-foreground">Capture selection</strong>.</li>
+            <li>• Click the extension icon → capture the entire active page.</li>
+            <li>• Captures arrive instantly in your dashboard with AI analysis.</li>
+          </ul>
+        </div>
       </Section>
 
       <Section title="Data Management">
+        <p className="text-xs text-muted-foreground -mt-2">Export everything you've captured. No paywall, ever.</p>
         <div className="grid sm:grid-cols-2 gap-2">
-          <Button variant="outline" onClick={() => exportAll("json")}>Export all (JSON)</Button>
-          <Button variant="outline" onClick={() => exportAll("md")}>Export all (Markdown)</Button>
+          <Button variant="outline" onClick={() => exportAll("json")}>
+            <ExternalLink className="size-3.5 mr-1.5" /> Export all (JSON)
+          </Button>
+          <Button variant="outline" onClick={() => exportAll("md")}>
+            <ExternalLink className="size-3.5 mr-1.5" /> Export all (Markdown)
+          </Button>
         </div>
       </Section>
 
-      <Section title="Plan">
+      <Section title="Usage">
         <div className="flex items-center justify-between">
           <div>
-            <span className="inline-flex rounded-full bg-primary/15 text-primary px-2 py-0.5 text-xs font-semibold uppercase">{profile.data?.plan ?? "free"}</span>
-            <p className="text-sm mt-2">{profile.data?.memory_count ?? 0} / 50 memories used</p>
-            <div className="mt-1 h-1.5 w-48 rounded-full bg-white/5"><div className="h-full gradient-bg rounded-full" style={{ width: `${Math.min(100, ((profile.data?.memory_count ?? 0) / 50) * 100)}%` }} /></div>
+            <span className="inline-flex rounded-full bg-emerald-500/15 text-emerald-400 px-2 py-0.5 text-xs font-semibold uppercase">Free • Unlimited</span>
+            <p className="text-sm mt-2">{profile.data?.memory_count ?? 0} memories captured</p>
+            <p className="text-xs text-muted-foreground mt-1">No limits. No subscription. Bring your own Gemini API key for AI analysis.</p>
           </div>
-          <Button className="gradient-bg border-0">Upgrade to Pro</Button>
         </div>
       </Section>
 
       <Section title="Danger Zone" danger>
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2 text-sm text-destructive"><AlertTriangle className="size-4" /> Delete all memories & projects</div>
-          <Button variant="outline" className="border-destructive text-destructive" onClick={() => { if (confirm("This permanently deletes everything. Continue?")) deleteAll.mutate(); }}>
+        <div className="flex items-center justify-between flex-wrap gap-3">
+          <div className="flex items-center gap-2 text-sm text-destructive"><AlertTriangle className="size-4" /> Permanently delete all memories & projects</div>
+          <Button variant="outline" className="border-destructive/50 text-destructive hover:bg-destructive/10" onClick={() => { if (confirm("This permanently deletes everything. Continue?")) deleteAll.mutate(); }}>
             Delete everything
           </Button>
         </div>
