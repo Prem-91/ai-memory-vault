@@ -43,7 +43,13 @@ function CapturePage() {
 
   const analyzeMut = useMutation({
     mutationFn: async () => {
-      const res = await analyzeFn({ data: { raw_content: content, title_hint: title } });
+      const { data: sessionData } = await supabase.auth.getSession();
+      const token = sessionData.session?.access_token;
+      if (!token) throw new Error("Not signed in");
+      const res = await analyzeFn({
+        data: { raw_content: content, title_hint: title },
+        headers: { Authorization: `Bearer ${token}` },
+      });
       if (res.error || !res.data) throw new Error(res.error ?? "Analysis failed");
       return res.data;
     },
