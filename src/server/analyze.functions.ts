@@ -1,4 +1,6 @@
-import { createServerFn } from "@tanstack/react-start";
+import { createServerFn, createMiddleware } from "@tanstack/react-start";
+import { getRequest } from "@tanstack/react-start/server";
+import { createClient } from "@supabase/supabase-js";
 import { z } from "zod";
 
 const AnalysisSchema = z.object({
@@ -15,6 +17,35 @@ export type MemoryAnalysis = z.infer<typeof AnalysisSchema>;
 const InputSchema = z.object({
   raw_content: z.string().min(1).max(120_000),
   title_hint: z.string().max(500).optional(),
+});
+
+// Auth middleware that validates against the EXTERNAL Supabase project
+const requireExternalAuth = createMiddleware({ type: "function" }).server(async ({ next }) => {
+  const SUPABASE_URL = process.env.EXTERNAL_SUPABASE_URL;
+  const SUPABASE_PUBLISHABLE_KEY = process.env.EXTERNAL_SUPABASE_PUBLISHABLE_KEY;
+
+  if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
+    throw new Response("Server misconfigured", { status: 500 });
+  }
+
+  const request = getRequest();
+  const authHeader = request?.headers.get("authorization");
+  if (!authHeader?.startsWith("Bearer ")) {
+    throw new Response("Unauthorized", { status: 401 });
+  }
+  const token = authHeader.slice(7);
+
+  const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
+    global: { headers: { Authorization: `Bearer ${token}` } },
+    auth: { persistSession: false, autoRefreshToken: false },
+  });
+
+  const { data, error } = await supabase.auth.getClaims(token);
+  if (error || !data?.claims?.sub) {
+    throw new Response("Unauthorized", { status: 401 });
+  }
+
+  return next({ context: { userId: data.claims.sub } });
 });
 
 const PROMPT = `You are an AI conversation analyzer. Extract structured information from the provided conversation.
@@ -65,7 +96,6 @@ async function callGemini(rawContent: string, apiKey: string): Promise<MemoryAna
   try {
     parsed = JSON.parse(text);
   } catch {
-    // try to recover JSON from inside text
     const match = text.match(/\{[\s\S]*\}/);
     if (!match) throw new Error("Gemini returned non-JSON");
     parsed = JSON.parse(match[0]);
@@ -74,11 +104,12 @@ async function callGemini(rawContent: string, apiKey: string): Promise<MemoryAna
 }
 
 export const analyzeMemory = createServerFn({ method: "POST" })
+  .middleware([requireExternalAuth])
   .inputValidator((input: unknown) => InputSchema.parse(input))
   .handler(async ({ data }): Promise<{ data: MemoryAnalysis | null; error: string | null }> => {
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) {
-      return { data: null, error: "GEMINI_API_KEY not configured" };
+      return { data: null, error: "AI analysis not configured" };
     }
 
     let lastErr: unknown;
@@ -94,6 +125,6 @@ export const analyzeMemory = createServerFn({ method: "POST" })
     console.error("Gemini analysis failed after 3 attempts:", lastErr);
     return {
       data: null,
-      error: lastErr instanceof Error ? lastErr.message : "Analysis failed",
+      error: "Analysis failed. Please try again.",
     };
   });
