@@ -1,36 +1,23 @@
 // External Supabase client — points at the user's OWN Supabase project
 // (not Lovable Cloud). All app code should import `supabase` from here.
+//
+// NOTE: The publishable (anon) key is safe to expose in client bundles.
+// Row-Level Security policies on every table protect user data.
 import { createClient } from "@supabase/supabase-js";
 import type { Database } from "@/integrations/supabase/types";
 
-function createExternalSupabase() {
-  const url =
-    (import.meta.env as Record<string, string | undefined>).VITE_EXTERNAL_SUPABASE_URL ||
-    process.env.EXTERNAL_SUPABASE_URL;
-  const key =
-    (import.meta.env as Record<string, string | undefined>).VITE_EXTERNAL_SUPABASE_PUBLISHABLE_KEY ||
-    process.env.EXTERNAL_SUPABASE_PUBLISHABLE_KEY;
+const EXTERNAL_SUPABASE_URL = "https://ioqkpjvjiojglpfajaak.supabase.co";
+const EXTERNAL_SUPABASE_PUBLISHABLE_KEY =
+  "sb_publishable_xA6b9HkLljE9Wlbu06RSfw_mPwwrYhn";
 
-  if (!url || !key) {
-    throw new Error(
-      "Missing EXTERNAL_SUPABASE_URL / EXTERNAL_SUPABASE_PUBLISHABLE_KEY. Configure them in project secrets.",
-    );
-  }
-
-  return createClient<Database>(url, key, {
+export const supabase = createClient<Database>(
+  EXTERNAL_SUPABASE_URL,
+  EXTERNAL_SUPABASE_PUBLISHABLE_KEY,
+  {
     auth: {
       storage: typeof window !== "undefined" ? window.localStorage : undefined,
       persistSession: true,
       autoRefreshToken: true,
     },
-  });
-}
-
-let _client: ReturnType<typeof createExternalSupabase> | undefined;
-
-export const supabase = new Proxy({} as ReturnType<typeof createExternalSupabase>, {
-  get(_, prop, receiver) {
-    if (!_client) _client = createExternalSupabase();
-    return Reflect.get(_client, prop, receiver);
   },
-});
+);
