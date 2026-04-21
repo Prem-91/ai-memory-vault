@@ -6,4 +6,16 @@
 // You can pass additional config via defineConfig({ vite: { ... } }) if needed.
 import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 
-export default defineConfig();
+// Inject EXTERNAL_SUPABASE_* secrets as VITE-style build-time constants so the
+// browser bundle can reach the user's own Supabase project (not Lovable Cloud).
+const externalUrl = process.env.EXTERNAL_SUPABASE_URL ?? "";
+const externalKey = process.env.EXTERNAL_SUPABASE_PUBLISHABLE_KEY ?? "";
+
+export default defineConfig({
+  vite: {
+    define: {
+      "import.meta.env.VITE_EXTERNAL_SUPABASE_URL": JSON.stringify(externalUrl),
+      "import.meta.env.VITE_EXTERNAL_SUPABASE_PUBLISHABLE_KEY": JSON.stringify(externalKey),
+    },
+  },
+});

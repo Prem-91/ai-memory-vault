@@ -1,5 +1,4 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { createClient } from "@supabase/supabase-js";
 import type { Database } from "@/integrations/supabase/types";
 import { z } from "zod";
@@ -7,28 +6,59 @@ import { z } from "zod";
 const SyncSchema = z.object({
   title: z.string().min(1).max(500),
   raw_content: z.string().min(1).max(200_000),
-  source_platform: z.enum(["chatgpt", "claude", "gemini", "manual", "selection"]).default("manual"),
+  source_platform: z
+    .enum([
+      "chatgpt",
+      "claude",
+      "gemini",
+      "perplexity",
+      "copilot",
+      "mistral",
+      "deepseek",
+      "grok",
+      "poe",
+      "you",
+      "phind",
+      "huggingface",
+      "manual",
+      "selection",
+    ])
+    .default("manual"),
   capture_method: z.string().max(50).default("auto"),
   project_id: z.string().uuid().nullable().optional(),
   tags: z.array(z.string().max(50)).max(20).optional(),
 });
+
+const CORS = {
+  "Content-Type": "application/json",
+  "Access-Control-Allow-Origin": "*",
+};
 
 export const Route = createFileRoute("/api/extension/sync")({
   server: {
     handlers: {
       POST: async ({ request }) => {
         try {
+          const SUPABASE_URL = process.env.EXTERNAL_SUPABASE_URL;
+          const SUPABASE_PUBLISHABLE_KEY = process.env.EXTERNAL_SUPABASE_PUBLISHABLE_KEY;
+          const SUPABASE_SERVICE_ROLE_KEY = process.env.EXTERNAL_SUPABASE_SERVICE_ROLE_KEY;
+
+          if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY || !SUPABASE_SERVICE_ROLE_KEY) {
+            return new Response(
+              JSON.stringify({ error: "Server not configured (missing EXTERNAL Supabase secrets)" }),
+              { status: 500, headers: CORS },
+            );
+          }
+
           const auth = request.headers.get("authorization");
           if (!auth?.startsWith("Bearer ")) {
             return new Response(JSON.stringify({ error: "Missing bearer token" }), {
               status: 401,
-              headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
+              headers: CORS,
             });
           }
           const token = auth.slice(7);
 
-          const SUPABASE_URL = process.env.SUPABASE_URL!;
-          const SUPABASE_PUBLISHABLE_KEY = process.env.SUPABASE_PUBLISHABLE_KEY!;
           const userClient = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
             global: { headers: { Authorization: `Bearer ${token}` } },
             auth: { persistSession: false, autoRefreshToken: false },
@@ -38,7 +68,7 @@ export const Route = createFileRoute("/api/extension/sync")({
           if (claimsErr || !claims?.claims?.sub) {
             return new Response(JSON.stringify({ error: "Invalid token" }), {
               status: 401,
-              headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
+              headers: CORS,
             });
           }
           const userId = claims.claims.sub;
@@ -46,7 +76,11 @@ export const Route = createFileRoute("/api/extension/sync")({
           const body = await request.json();
           const parsed = SyncSchema.parse(body);
 
-          const { data, error } = await supabaseAdmin
+          const adminClient = createClient<Database>(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
+            auth: { persistSession: false, autoRefreshToken: false },
+          });
+
+          const { data, error } = await adminClient
             .from("memories")
             .insert({
               user_id: userId,
@@ -62,16 +96,10 @@ export const Route = createFileRoute("/api/extension/sync")({
 
           if (error) throw error;
 
-          return new Response(JSON.stringify({ data }), {
-            status: 200,
-            headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
-          });
+          return new Response(JSON.stringify({ data }), { status: 200, headers: CORS });
         } catch (e) {
           const msg = e instanceof Error ? e.message : "Server error";
-          return new Response(JSON.stringify({ error: msg }), {
-            status: 500,
-            headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
-          });
+          return new Response(JSON.stringify({ error: msg }), { status: 500, headers: CORS });
         }
       },
       OPTIONS: async () => {

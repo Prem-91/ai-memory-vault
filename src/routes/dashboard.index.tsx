@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { Brain, FolderKanban, Send, TrendingUp, Chrome, Sparkles, Copy, ArrowRight, X, Zap, Layers, Share2 } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/lib/auth";
 import { MemoryCard } from "@/components/memory-card";
 import { ProjectCard } from "@/components/project-card";
