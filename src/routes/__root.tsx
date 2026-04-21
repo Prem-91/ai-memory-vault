@@ -49,13 +49,19 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
         content:
           "Capture, organize, and inject context across ChatGPT, Claude, and Gemini. Stop re-explaining your projects.",
       },
-      { property: "og:title", content: "AI Context Bridge" },
+      { property: "og:title", content: "AI Context Bridge — Memory for every AI conversation" },
       {
         property: "og:description",
         content: "Your AI conversations deserve a memory.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "AI Context Bridge — Memory for every AI conversation" },
+      { name: "description", content: "AI Memory Vault organizes AI conversations, bridging context gaps across platforms for seamless AI interaction." },
+      { property: "og:description", content: "AI Memory Vault organizes AI conversations, bridging context gaps across platforms for seamless AI interaction." },
+      { name: "twitter:description", content: "AI Memory Vault organizes AI conversations, bridging context gaps across platforms for seamless AI interaction." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/3da68d70-ad96-427a-97a6-e061cd4f9888/id-preview-143bccc0--4e5a789f-e030-464d-819a-44b41edd0b62.lovable.app-1776779064481.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/3da68d70-ad96-427a-97a6-e061cd4f9888/id-preview-143bccc0--4e5a789f-e030-464d-819a-44b41edd0b62.lovable.app-1776779064481.png" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
