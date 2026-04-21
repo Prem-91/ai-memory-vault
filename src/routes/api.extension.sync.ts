@@ -73,8 +73,24 @@ export const Route = createFileRoute("/api/extension/sync")({
           }
           const userId = claims.claims.sub;
 
-          const body = await request.json();
-          const parsed = SyncSchema.parse(body);
+          let body: unknown;
+          try {
+            body = await request.json();
+          } catch {
+            return new Response(JSON.stringify({ error: "Invalid JSON body" }), {
+              status: 400,
+              headers: CORS,
+            });
+          }
+
+          const parseResult = SyncSchema.safeParse(body);
+          if (!parseResult.success) {
+            return new Response(JSON.stringify({ error: "Invalid request payload" }), {
+              status: 400,
+              headers: CORS,
+            });
+          }
+          const parsed = parseResult.data;
 
           const adminClient = createClient<Database>(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
             auth: { persistSession: false, autoRefreshToken: false },
@@ -94,12 +110,18 @@ export const Route = createFileRoute("/api/extension/sync")({
             .select()
             .single();
 
-          if (error) throw error;
+          if (error) {
+            console.error("[extension/sync] insert failed:", error);
+            return new Response(JSON.stringify({ error: "Failed to save memory" }), {
+              status: 500,
+              headers: CORS,
+            });
+          }
 
           return new Response(JSON.stringify({ data }), { status: 200, headers: CORS });
         } catch (e) {
-          const msg = e instanceof Error ? e.message : "Server error";
-          return new Response(JSON.stringify({ error: msg }), { status: 500, headers: CORS });
+          console.error("[extension/sync] unexpected error:", e);
+          return new Response(JSON.stringify({ error: "Server error" }), { status: 500, headers: CORS });
         }
       },
       OPTIONS: async () => {
