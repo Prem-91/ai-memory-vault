@@ -61,7 +61,7 @@ We welcome contributions to the AI Memory Vault project! To get started:
 
 ## Other Documentation Elements
 - **License**: This project is licensed under the MIT License.
-- **Contact**: For any questions or feedback, please reach out to [your-email@example.com].
+- **Contact**: For any questions or feedback, please reach out to [shindeprem695@gmail.com].
 
 ---
 
