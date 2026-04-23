@@ -176,7 +176,7 @@ function LoginPage() {
         </div>
 
         <p className="mt-6 text-center text-xs text-muted-foreground">
-          Codes expire in 10 minutes. Free forever — 50 memories, 3 projects.
+          Codes expire in 10 minutes. 100% free — unlimited memories & projects.
         </p>
       </div>
     </div>
