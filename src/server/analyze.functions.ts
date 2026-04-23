@@ -1,6 +1,5 @@
-import { createServerFn, createMiddleware } from "@tanstack/react-start";
-import { getRequest } from "@tanstack/react-start/server";
-import { createClient } from "@supabase/supabase-js";
+import { createServerFn } from "@tanstack/react-start";
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
 
 const AnalysisSchema = z.object({
@@ -17,35 +16,6 @@ export type MemoryAnalysis = z.infer<typeof AnalysisSchema>;
 const InputSchema = z.object({
   raw_content: z.string().min(1).max(120_000),
   title_hint: z.string().max(500).optional(),
-});
-
-// Auth middleware that validates against the EXTERNAL Supabase project
-const requireExternalAuth = createMiddleware({ type: "function" }).server(async ({ next }) => {
-  const SUPABASE_URL = process.env.EXTERNAL_SUPABASE_URL;
-  const SUPABASE_PUBLISHABLE_KEY = process.env.EXTERNAL_SUPABASE_PUBLISHABLE_KEY;
-
-  if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
-    throw new Response("Server misconfigured", { status: 500 });
-  }
-
-  const request = getRequest();
-  const authHeader = request?.headers.get("authorization");
-  if (!authHeader?.startsWith("Bearer ")) {
-    throw new Response("Unauthorized", { status: 401 });
-  }
-  const token = authHeader.slice(7);
-
-  const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
-    global: { headers: { Authorization: `Bearer ${token}` } },
-    auth: { persistSession: false, autoRefreshToken: false },
-  });
-
-  const { data, error } = await supabase.auth.getClaims(token);
-  if (error || !data?.claims?.sub) {
-    throw new Response("Unauthorized", { status: 401 });
-  }
-
-  return next({ context: { userId: data.claims.sub } });
 });
 
 const PROMPT = `You are an AI conversation analyzer. Extract structured information from the provided conversation.
@@ -104,7 +74,7 @@ async function callGemini(rawContent: string, apiKey: string): Promise<MemoryAna
 }
 
 export const analyzeMemory = createServerFn({ method: "POST" })
-  .middleware([requireExternalAuth])
+  .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => InputSchema.parse(input))
   .handler(async ({ data }): Promise<{ data: MemoryAnalysis | null; error: string | null }> => {
     const apiKey = process.env.GEMINI_API_KEY;
