@@ -41,9 +41,8 @@ export const Route = createFileRoute("/api/extension/sync")({
         try {
           const SUPABASE_URL = process.env.SUPABASE_URL;
           const SUPABASE_PUBLISHABLE_KEY = process.env.SUPABASE_PUBLISHABLE_KEY;
-          const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-          if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY || !SUPABASE_SERVICE_ROLE_KEY) {
+          if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
             return new Response(
               JSON.stringify({ error: "Server not configured" }),
               { status: 500, headers: CORS },
@@ -92,11 +91,7 @@ export const Route = createFileRoute("/api/extension/sync")({
           }
           const parsed = parseResult.data;
 
-          const adminClient = createClient<Database>(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
-            auth: { persistSession: false, autoRefreshToken: false },
-          });
-
-          const { data, error } = await adminClient
+          const { data, error } = await userClient
             .from("memories")
             .insert({
               user_id: userId,
