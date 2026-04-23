@@ -39,13 +39,13 @@ export const Route = createFileRoute("/api/extension/sync")({
     handlers: {
       POST: async ({ request }) => {
         try {
-          const SUPABASE_URL = process.env.EXTERNAL_SUPABASE_URL;
-          const SUPABASE_PUBLISHABLE_KEY = process.env.EXTERNAL_SUPABASE_PUBLISHABLE_KEY;
-          const SUPABASE_SERVICE_ROLE_KEY = process.env.EXTERNAL_SUPABASE_SERVICE_ROLE_KEY;
+          const SUPABASE_URL = process.env.SUPABASE_URL;
+          const SUPABASE_PUBLISHABLE_KEY = process.env.SUPABASE_PUBLISHABLE_KEY;
+          const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
           if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY || !SUPABASE_SERVICE_ROLE_KEY) {
             return new Response(
-              JSON.stringify({ error: "Server not configured (missing EXTERNAL Supabase secrets)" }),
+              JSON.stringify({ error: "Server not configured" }),
               { status: 500, headers: CORS },
             );
           }
