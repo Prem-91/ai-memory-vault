@@ -5,3 +5,5 @@ node_modules
 dist
 .output
 coverage
+wrangler.jsonc
+.wrangler
